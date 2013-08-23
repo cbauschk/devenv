@@ -5,7 +5,9 @@ mkdir ~/devenvbkp
 cp ~/.vimrc ~/devenvbkp/vimrc
 cp ~/.bashrc ~/devenvbkp/bashrc
 cp -r ~/.vim ~/devenvbkp/vim
+cp ~/.inputrc ~/devenvbkp/inputrc
 
 cp vimrc ~/.vimrc
 cp bashrc ~/.bashrc
 cp -r vim ~/.vim
+cp inputrc ~/.inputrc
