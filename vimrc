@@ -125,4 +125,10 @@ if has("autocmd")
 	autocmd BufWritePost * call Automake()
 endif
 
+"something about the colorscheme
 let g:rehash256=1
+"move through tabs with C-j and C-k
+nnoremap<C-j> :tabprevious<CR>
+nnoremap<C-k> :tabnext<CR>
+nnoremap <silent> <A-j> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
+nnoremap <silent> <A-k> :execute 'silent! tabmove ' . tabpagenr()<CR>
