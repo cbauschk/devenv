@@ -9,24 +9,24 @@ set nobackup
 
 "if xterm, assume color is OK
 if &term =~ "xterm" || &term =~ "color"
-	set t_Co=8
-	"Tell vim it's ok to send color
-	if &term =~ "xterm"
+  set t_Co=8
+  "Tell vim it's ok to send color
+  if &term =~ "xterm"
     set term=xterm-256color
-	endif
+  endif
 
-	"All around well balanced colorscheme
-	colorscheme ron
+  "All around well balanced colorscheme
+  colorscheme ron
 
-	"For med-dark monitors 'ron' or 'koehler' colorschemes are great
-	"colorscheme koehler
+  "For med-dark monitors 'ron' or 'koehler' colorschemes are great
+  "colorscheme koehler
 endif
 
 "if terminal supports 256 coloring
 if &term =~ "256color"
-	"For bright monitors, 'ir-black' is nice to the eyes, enable 256 mode and set colorscheme to 'ir-black'
-	set t_Co=256
-	colorscheme molokai
+  "For bright monitors, 'ir-black' is nice to the eyes, enable 256 mode and set colorscheme to 'ir-black'
+  set t_Co=256
+  colorscheme molokai
 endif
 
 "Turn on syntax highlighting, this works regardless of color settings
@@ -45,8 +45,8 @@ set selectmode-=mouse "Use the mouse just like visual mode, so you can use vim c
 set backspace=2 "backspace works in insert mode, much more user-friendly
 set tabstop=2 "set tab width to 4 spaces
 set shiftwidth=2 "set (auto)tab's to width of 4 spaces
-set expandtab
-"Neither of the above actually puts spaces into a file when tabbing, they simply display 4 spaces when a \t is read
+"Neither of the above actually puts spaces into a file when tabbing, they simply display 2 spaces when a \t is read
+set expandtab "convert all tabs that are typed into spaces
 set ignorecase "ignore case when searching
 set hlsearch "highlight searchs
 set smartcase "override ignorecase if any search character is uppercase
@@ -77,6 +77,27 @@ filetype on
 filetype indent on
 filetype plugin on
 
+"====[ Use persistent undo ]=================
+"if has('persistent_undo')
+"  set undodir=$HOME/tmp/.VIM_UNDO_FILES
+"  set undolevels=5000
+"  set undofile
+"endif
+
+"=====[ Correct common mistypings in-the-fly ]=======================
+iab    retrun  return
+iab     pritn  print
+iab       teh  the
+iab      liek  like
+iab  liekwise  likewise
+iab      Pelr  Perl
+iab      pelr  perl
+iab        ;t  't
+iab    Jarrko  Jarkko
+iab    jarrko  jarkko
+iab      moer  more
+iab  previosu  previous
+
 "Wrap visual selections with chars
 :vnoremap ( "zdi(<C-R>z)<ESC>
 :vnoremap { "zdi{<C-R>z}<ESC>
@@ -91,44 +112,46 @@ filetype plugin on
 
 " Automake using a screen window
 function! Automake()
-	if !$STY
-		"echo "Not in a screen" "for debugging, be silent if no screen
-		return
-	endif
-	let sty = strpart(matchstr($STY,"\\..*"), 1)
-	silent! exec "!screen -p 0 -S ".sty."-test -X eval 'stuff make'" | redraw!
+  if !$STY
+    "echo "Not in a screen" "for debugging, be silent if no screen
+    return
+  endif
+  let sty = strpart(matchstr($STY,"\\..*"), 1)
+  silent! exec "!screen -p 0 -S ".sty."-test -X eval 'stuff make'" | redraw!
 endfunction
 
 " Autocompletion using the TAB key
 " This function determines, whether we are on the start of the line text (then tab indents) or
 " if we want to try autocompletion
 function! InsertTabWrapper()
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<tab>"
-    else
-        return "\<c-p>"
-    endif
+  let col = col('.') - 1
+  if !col || getline('.')[col - 1] !~ '\k'
+    return "\<tab>"
+  else
+    return "\<c-p>"
+  endif
 endfunction
 " Remap the tab key to select action with InsertTabWrapper
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 
 if has("autocmd")
-    " Have Vim jump to the last position when reopening a file
-    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-      \| exe "normal! g'\"" | endif
+  " Have Vim jump to the last position when reopening a file
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+        \| exe "normal! g'\"" | endif
 
-    " Trim Trailing white space on general files
-    autocmd FileType c,cpp,java,php,js,css,xml,xsl,s,go autocmd BufWritePre * :%s/[ \t\r]\+$//e
+  " Trim Trailing white space on general files
+  autocmd FileType c,cpp,java,php,js,css,xml,xsl,s,go autocmd BufWritePre * :%s/[ \t\r]\+$//e
 
-	"Automake on save
-	autocmd BufWritePost * call Automake()
+  "Automake on save
+  autocmd BufWritePost * call Automake()
 endif
 
-"something about the colorscheme
+"something about the colorscheme?
 let g:rehash256=1
-"move through tabs with C-j and C-k
+
+"ctrl+j or k moves through tabs
 nnoremap<C-j> :tabprevious<CR>
 nnoremap<C-k> :tabnext<CR>
+"alt+j or k moves tabs
 nnoremap <silent> <A-j> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 nnoremap <silent> <A-k> :execute 'silent! tabmove ' . tabpagenr()<CR>
