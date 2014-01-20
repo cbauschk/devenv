@@ -1,128 +1,369 @@
-"act similar to mswin applications, Control+C, Control+P, etc.
-behave mswin
+"
+" Customizations are organized into logical sections. Mappings are organized
+" by section. Plugin customizations are located near the bottom.
+"
+" Thanks:
+" @garybernhardt
+" @tpope
+" @carllerche
+" @wycats
+" @nelstrom
+" @mislav
+" @mathiasbynens
+" @ckillian
 
-"its ok to not be vi compatibale
+" =============================================================================
+" Initialization
+" =============================================================================
+
+" Clear autocmds
+autocmd!
+
+" Use Vim settings, rather than Vi settings (default when a vimrc exists)
 set nocompatible
 
-"don't create ~filename backups, very annoying to leave this on and find dozens of extra files scattered about
-set nobackup
+"" Load plugins with Pathogen
+runtime bundle/pathogen/autoload/pathogen.vim
+execute pathogen#infect()
 
-"if xterm, assume color is OK
-if &term =~ "xterm" || &term =~ "color"
-  set t_Co=8
-  "Tell vim it's ok to send color
-  if &term =~ "xterm"
-    set term=xterm-256color
-  endif
+" Enable file type detection and load plugin indent files
+filetype plugin indent on
 
-  "All around well balanced colorscheme
-  colorscheme ron
+" Load vimrc from current directory and disable unsafe commands in them
+set exrc
+set secure
 
-  "For med-dark monitors 'ron' or 'koehler' colorschemes are great
-  "colorscheme koehler
+" Use UTF-8 without BOM
+set encoding=utf-8 nobomb
+
+" Respect modelines in files up to this number of lines
+set modeline
+set modelines=4
+
+" Set comma as <leader> instead of default backslash
+let mapleader=","
+
+" =============================================================================
+" Terminal Interaction
+" =============================================================================
+
+" Prevent Vim from clearing the scrollback buffer
+" http://www.shallowsky.com/linux/noaltscreen.html
+set t_ti= t_te=
+
+" Clear PAGER if Vim's Man function is needed
+let $PAGER=''
+
+" =============================================================================
+" Editing
+" =============================================================================
+
+""
+"" Whitespace
+""
+
+set expandtab     " Tab in insert mode will produce spaces
+set tabstop=2     " Width of a tab
+set shiftwidth=2  " Width of reindent operations and auto indentation
+set softtabstop=2 " Set spaces for tab in insert mode
+set autoindent    " Enable auto indentation
+
+" Backspace over everything in insert mode
+set backspace=indent,eol,start
+
+" Invisible characters
+"set listchars=tab:▸\ ,nbsp:_
+"set listchars=tab:\ \ ,trail:·,eol:¬,nbsp:_,extends:❯,precedes:❮
+set listchars=tab:▸\ ,trail:·,eol:¬,nbsp:_,extends:❯,precedes:❮
+
+" Don't show invisible characters (default)
+set nolist
+
+""
+"" Wrapping
+""
+
+set wrap " Enable wrapping
+set showbreak=↪\  " Character to precede line wraps
+
+" Always move down and up by display lines instead of real lines
+" nnoremap <silent>j gj
+" nnoremap <silent>k gk
+
+""
+"" Joining
+""
+
+" Delete comment character when joining commented lines
+if v:version > 703 || v:version == 703 && has("patch541")
+  set formatoptions+=j     
 endif
 
-"if terminal supports 256 coloring
-if &term =~ "256color"
-  "For bright monitors, 'ir-black' is nice to the eyes, enable 256 mode and set colorscheme to 'ir-black'
-  set t_Co=256
-  colorscheme molokai
+" Use only 1 space after "." when joining lines instead of 2
+set nojoinspaces
+
+" Joining with indents is useless - instead join and delete spaces
+nnoremap gJ Jdiw
+
+""
+"" Other
+""
+
+" Don't reset cursor to start of line when moving around
+set nostartofline
+
+" Do not jump to the matching bracket upon bracket insert (default)
+set noshowmatch
+
+" Insert a hash rocket with <c-l>
+imap <c-l> <space>=><space>
+
+" Set <c-c> to escape in insert mode
+inoremap <c-c> <esc>
+
+" Set <c-j> to underscore in insert mode
+inoremap <c-j> _
+
+" =============================================================================
+" Appearance
+" =============================================================================
+
+set cursorline      " Highlight current line
+set scrolloff=5     " Keep more buffer context when scrolling
+set showtabline=2   " Always show the tab bar
+set cmdheight=1     " Set command line height (default)
+set title           " Show the filename in the window titlebar
+set t_Co=256        " 256 colors
+set background=dark " Dark background
+syntax on           " Enable syntax highlighting
+colorscheme molokai " Set the default colorscheme
+set noerrorbells    " Disable error bells
+set shortmess=atI   " Don't show the Vim intro message
+set number          " Show line numbers
+
+" Use relative line numbers - This is now handled by numbers.vim
+" if exists("&relativenumber")
+"   set relativenumber
+"   au BufReadPost * set relativenumber
+" endif
+
+""
+"" Status Line
+""
+
+if has("statusline") && !&cp
+  set laststatus=2 " windows always have status line
+  set statusline=%f\ %y\%m\%r " filename [type][modified][readonly]
+  "set stl+=%{fugitive#statusline()} " git via fugitive.vim
+  " buffer number / buffer count
+  set stl+=\[b%n/%{len(filter(range(1,bufnr('$')),'buflisted(v:val)'))}\]
+  set stl+=\ %l/%L[%p%%]\,%v " line/total[%],column
 endif
 
-"Turn on syntax highlighting, this works regardless of color settings
-syntax on
+" =============================================================================
+" Command Line
+" =============================================================================
 
-"enable the mouse & features
-set mouse=a
-set selectmode-=mouse "Use the mouse just like visual mode, so you can use vim commands on mouse selections, eg. 'x' to cut and 'y' to yank
+" Display incomplete commands below the status line
+set showcmd
 
-"This is should match your terminal background, white-on-black is the default
-"vim setting. For black-on-white choose 'light'
-"set background=dark
-"set background=light
+" Default shell and shell syntax
+set shell=bash
+let g:is_bash=1
 
+" Remember more commands and search history (default: 20)
+set history=100
 
-set backspace=2 "backspace works in insert mode, much more user-friendly
-set tabstop=2 "set tab width to 4 spaces
-set shiftwidth=2 "set (auto)tab's to width of 4 spaces
-"Neither of the above actually puts spaces into a file when tabbing, they simply display 2 spaces when a \t is read
-set expandtab "convert all tabs that are typed into spaces
-set ignorecase "ignore case when searching
-set hlsearch "highlight searchs
-set smartcase "override ignorecase if any search character is uppercase
-set autoindent "turn on auto indent
-set smartindent "turn on smart indent
-set number "show line numbers
-set nowrap "don't wrap lines longer than the screen's width
-set guioptions+=b "show bottom scrollbar when in gvim
-set foldmethod=indent "fold code based on indents
-set nofoldenable "makes sure the code is not folded when first opened, used zi to toggle
-set ruler "Show line statistics in bottom left corner
-set scrolloff=4 "Keep 4 lines at minimum above & below the cursor when scrolling around a file
+" Set <c-n> and <c-p> to act like Up/Down so will filter command history
+" Practical Vim p.69
+cnoremap <c-p> <up>
+cnoremap <c-n> <down>
 
-"These options are personal preference
-set cursorline "Underline the current line the cursor is on.
-"set incsearch "highlight search matches as typed, may jar your mind while it jumps around the file
+" <c-a> jumps to beginning of line to match <c-e>
+cnoremap <c-a> <home>
 
-"Upgrade the status line to give more useful information
-set statusline=%F\ %m%r%w%y\ %=(%L\ loc)\ [#\%03.3b\ 0x\%02.2B]\ \ %l,%v\ \ %P
-set laststatus=2 "Make statusline always on
-set cmdheight=2 "default command line number of lines, 2 makes it easier to read
+" Open help in a vertical split instead of the default horizontal split
+" http://vim.wikia.com/wiki/Replace_a_builtin_command_using_cabbrev
+cabbrev h <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert h' : 'h')<cr>
+cabbrev help <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert h' : 'help')<cr>
 
-"Printing (:hardcopy) options
-set printoptions=paper:letter,syntax:y,number:y,duplex:off,left:5pc
+" Expand %% to current directory
+" http://vimcasts.org/e/14
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
 
-"Enable filetype's
-filetype on
-filetype indent on
-filetype plugin on
+""
+"" Wildmode
+""
 
-"====[ Use persistent undo ]=================
-"if has('persistent_undo')
-"  set undodir=$HOME/tmp/.VIM_UNDO_FILES
-"  set undolevels=5000
-"  set undofile
-"endif
+" Make tab completion for files/buffers act like bash
+set wildmenu
 
-"=====[ Correct common mistypings in-the-fly ]=======================
-iab    retrun  return
-iab     pritn  print
-iab       teh  the
-iab      liek  like
-iab  liekwise  likewise
-iab      Pelr  Perl
-iab      pelr  perl
-iab        ;t  't
-iab    Jarrko  Jarkko
-iab    jarrko  jarkko
-iab      moer  more
-iab  previosu  previous
+" Use emacs-style tab completion when selecting files, etc
+set wildmode=longest,list
 
-"Wrap visual selections with chars
-:vnoremap ( "zdi(<C-R>z)<ESC>
-:vnoremap { "zdi{<C-R>z}<ESC>
-:vnoremap [ "zdi[<C-R>z]<ESC>
-:vnoremap ' "zdi'<C-R>z'<ESC>
-:vnoremap " "zdi"<C-R>z"<ESC>
+" Disable output and VCS files
+set wildignore+=*.o,*.out,*.obj,.git,*.rbc,*.rbo,*.class,.svn,*.gem
 
-"If your having trouble with the backspace character, try uncommenting these
-"imap <C-?> <BS>
-"imap <C-H> <BS>
-"inoremap <BS>
+" Disable archive files
+set wildignore+=*.zip,*.tar.gz,*.tar.bz2,*.rar,*.tar.xz
 
-" Automake using a screen window
-function! Automake()
-  if !$STY
-    "echo "Not in a screen" "for debugging, be silent if no screen
-    return
-  endif
-  let sty = strpart(matchstr($STY,"\\..*"), 1)
-  silent! exec "!screen -p 0 -S ".sty."-test -X eval 'stuff make'" | redraw!
+" Ignore bundler and sass cache
+set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
+
+" Ignore rails temporary asset caches
+set wildignore+=*/tmp/cache/assets/*/sprockets/*,*/tmp/cache/assets/*/sass/*
+
+" Ignore node modules
+set wildignore+=node_modules/*
+
+" Disable temp and backup files
+set wildignore+=*.swp,*~,._*
+
+""
+"" Search
+""
+
+set hlsearch   " Highlight searches
+set incsearch  " Highlight dynamically as pattern is typed
+set ignorecase " Make searches case-insensitive...
+set smartcase  " ...unless they contain at least one uppercase character
+set gdefault   " Use global search by default
+
+" Clear last search highlighting with enter and clear the command line
+function! MapCR()
+  nnoremap <cr> :nohlsearch<cr>:<backspace>
+endfunction
+call MapCR()
+
+" Re-highlight last search pattern
+nnoremap <leader>hs :set hlsearch<cr>
+
+" =============================================================================
+" Buffers
+" =============================================================================
+
+" Allow unsaved background buffers and remember marks/undo for them
+set hidden
+
+" Jump to the first open window that contains the specified buffer
+set switchbuf=useopen
+
+" Auto-reload buffers when files are changed on disk
+set autoread
+
+" Toggle current and alternate buffers
+nnoremap <leader><leader> <c-^>
+
+" Remember buffer count to show in status line
+" au BufAdd * let g:zbuflistcount += 1
+" au BufDelete * let g:zbuflistcount -= 1
+au VimEnter * call UpdateZBufLC()
+function UpdateZBufLC()
+  let lst = range(1, bufnr('$'))
+  call filter(lst, 'buflisted(v:val)')
+  let g:zbuflistcount = len(lst)
 endfunction
 
-" Autocompletion using the TAB key
-" This function determines, whether we are on the start of the line text (then tab indents) or
-" if we want to try autocompletion
+" =============================================================================
+" Windows
+" =============================================================================
+
+" Set window width that works with standard 15" screen
+set winwidth=80
+
+" Split windows below and right instead of above and left
+set splitbelow splitright
+
+" Move around splits with <c-h/j/k/l> - This is now handled by
+" tmux_navigator.vim - https://gist.github.com/mislav/5189704
+" nnoremap <c-h> <c-w>h
+" nnoremap <c-j> <c-w>j
+" nnoremap <c-k> <c-w>k
+" nnoremap <c-l> <c-w>l
+
+" =============================================================================
+" Registers
+" =============================================================================
+
+" Use the OS clipboard by default
+set clipboard=unnamed
+
+" Copy to X11 primary clipboard
+map <leader>y "*y
+
+" Paste from unnamed register and fix indentation
+nmap <leader>p pV`]=
+
+" Repeat the last macro in the `q` register
+nmap <leader>2 @q
+
+" Delete to the blackhole register
+nnoremap <leader>x "_x
+nnoremap <leader>d "_dd
+
+" =============================================================================
+" Backup
+" =============================================================================
+
+" Store temporary files in a central location
+"set backup
+"set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+"set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+
+" Ignore tmp directories for backup
+"set backupskip=/tmp/*,/private/tmp/*
+
+" Don't make a backup before overwriting a file
+set nobackup
+set nowritebackup
+
+" Disable swap files
+set updatecount=0
+
+" =============================================================================
+" Filetypes and Custom Autocmds
+" =============================================================================
+
+augroup vimrcEx
+  " Clear all autocmds for the current group
+  autocmd!
+
+  " Jump to last cursor position unless it's invalid or in an event handler or
+  " a git commit
+  au BufReadPost *
+        \ if &filetype !~ '^git\c' && line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif
+
+  " Some file types use real tabs
+  au FileType {make,gitconfig} set noexpandtab sw=4
+
+  " Treat JSON files like JavaScript
+  au BufNewFile,BufRead *.json setf javascript
+
+  " Make Python follow PEP8
+  au FileType python set sts=4 ts=4 sw=4 tw=79
+
+  " Make sure all markdown files have the correct filetype
+  au BufRead,BufNewFile *.{md,markdown,mdown,mkd,mkdn,txt} setf markdown
+
+  " MultiMarkdown requires 4-space tabs
+  au FileType markdown set sts=4 ts=4 sw=4
+
+  " Use 4-space tabs for apache
+  au FileType apache set sts=4 ts=4 sw=4
+
+  " Leave the return key alone when in command line windows, since it's used
+  " to run commands there
+  au! CmdwinEnter * :unmap <cr>
+  au! CmdwinLeave * :call MapCR()
+augroup END
+
+" =============================================================================
+" Multipurpose Tab Key
+" =============================================================================
+
+" Indent if at the beginning of a line, else do completion
 function! InsertTabWrapper()
   let col = col('.') - 1
   if !col || getline('.')[col - 1] !~ '\k'
@@ -131,27 +372,133 @@ function! InsertTabWrapper()
     return "\<c-p>"
   endif
 endfunction
-" Remap the tab key to select action with InsertTabWrapper
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
+inoremap <s-tab> <c-n>
 
-if has("autocmd")
-  " Have Vim jump to the last position when reopening a file
-  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-        \| exe "normal! g'\"" | endif
+" =============================================================================
+" Performance
+" =============================================================================
 
-  " Trim Trailing white space on general files
-  autocmd FileType c,cpp,java,php,js,css,xml,xsl,s,go autocmd BufWritePre * :%s/[ \t\r]\+$//e
+" See :help slow-terminal
 
-  "Automake on save
-  autocmd BufWritePost * call Automake()
-endif
+" Optimize for fast terminal connections
+set ttyfast
 
-"something about the colorscheme?
-let g:rehash256=1
+" Time out on key codes but not mappings
+set notimeout
+set ttimeout
+set ttimeoutlen=100
 
-"ctrl+j or k moves through tabs
-nnoremap<C-j> :tabprevious<CR>
-nnoremap<C-k> :tabnext<CR>
-"alt+j or k moves tabs
-nnoremap <silent> <A-j> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
-nnoremap <silent> <A-k> :execute 'silent! tabmove ' . tabpagenr()<CR>
+" Update syntax highlighting for more lines increased scrolling performance
+syntax sync minlines=256
+
+" Don't syntax highlight long lines
+set synmaxcol=256
+
+" Don't redraw screen while executing macros, registers
+" set lazyredraw
+
+" Maximum number of lines to scroll the screen
+" ttyscroll=3
+
+" Jump by more lines when scrolling
+" set scrolljump=2
+
+" =============================================================================
+" Plugin Settings and Mappings
+" =============================================================================
+
+""
+"" Fugitive
+""
+
+nnoremap <leader>gb :Gblame<cr>
+nnoremap <leader>gc :Gcommit<cr>
+nnoremap <leader>gd :Gdiff<cr>
+nnoremap <leader>gl :Glog<cr>
+nnoremap <leader>gp :Git push<cr>
+nnoremap <leader>gs :Git status -sb<cr>
+
+""
+"" Matchit
+""
+
+" Enable Matchit to use % to jump between def/end, if/else/end
+runtime macros/matchit.vim
+
+""
+"" NERDTree
+""
+
+" Show hidden files in NERDTree
+let NERDTreeShowHidden=1
+let NERDTreeShowLineNumbers=1
+
+" Toggle NERDTree
+nnoremap <c-n> :NERDTreeToggle<cr>
+
+""
+"" Smooth Scroll
+""
+
+noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 12, 2)<cr>
+noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 14, 2)<cr>
+noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 22, 4)<cr>
+noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 24, 4)<cr>
+
+""
+"" Surround
+""
+
+nmap <leader>` ysiw`
+nmap <leader>' ysiw'
+
+" =============================================================================
+" Application Interaction
+" =============================================================================
+
+command! Marked silent !open -a "Marked.app" "%:p"
+nnoremap <silent> <leader>m :Marked<cr>\|:redraw!<cr>
+
+" =============================================================================
+" Typos, Errors, and Typing Discipline
+" =============================================================================
+
+" Fix common mistypes
+" Overwrite :Q Ex mode and :X encryption
+" http://vim.wikia.com/wiki/Replace_a_builtin_command_using_cabbrev
+command! W :w
+command! Q :q
+cabbrev X <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'x' : 'X')<cr>
+
+" Don't save files named ":" or ";"
+cnoremap w; w
+cnoremap W; w
+cnoremap x; x
+cnoremap X; x
+cnoremap w: w
+cnoremap W: w
+cnoremap x: x
+cnoremap X: x
+
+" Don't save files named ")" since this is a common mistake when shifts are
+" externally mapped to parentheses
+cnoremap w) w
+cnoremap W) w
+cnoremap x) x
+cnoremap X) x
+
+" Disable parentheses in normal mode since they are too easily triggered when
+" shifts are externally mapped to parentheses
+nnoremap ( <nop>
+nnoremap ) <nop>
+
+" Disable arrow keys in normal mode and insert mode
+noremap <left> <nop>
+noremap <right> <nop>
+noremap <up> <nop>
+noremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
