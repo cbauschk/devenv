@@ -119,6 +119,7 @@ set noshowmatch
 imap <c-l> <space>=><space>
 
 " Set <c-c> to escape in insert mode
+inoremap jk <esc>
 inoremap <c-c> <esc>
 
 " Set <c-j> to underscore in insert mode
@@ -280,6 +281,13 @@ set splitbelow splitright
 " nnoremap <c-j> <c-w>j
 " nnoremap <c-k> <c-w>k
 " nnoremap <c-l> <c-w>l
+let g:tmux_navigator_no_mappings = 1
+
+nnoremap <silent> {c-h} :TmuxNavigateLeft<cr>
+nnoremap <silent> {c-j} :TmuxNavigateDown<cr>
+nnoremap <silent> {c-k} :TmuxNavigateUp<cr>
+nnoremap <silent> {c-l} :TmuxNavigateRight<cr>
+nnoremap <silent> {c-\} :TmuxNavigatePrevious<cr>
 
 " =============================================================================
 " Registers
@@ -396,13 +404,13 @@ syntax sync minlines=256
 set synmaxcol=256
 
 " Don't redraw screen while executing macros, registers
-" set lazyredraw
+set lazyredraw
 
 " Maximum number of lines to scroll the screen
-" ttyscroll=3
+set ttyscroll=3
 
 " Jump by more lines when scrolling
-" set scrolljump=2
+"set scrolljump=2
 
 " =============================================================================
 " Plugin Settings and Mappings

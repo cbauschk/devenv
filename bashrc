@@ -28,17 +28,18 @@ shopt -s globstar
 # enable color support, should work with all modern terminals
 if [ "$TERM" != "dumb" ]; then
 
-	#Enable colors
-	if [ "`uname`" != "SunOS" ]; then
-		eval `dircolors -b`
-		alias ls="ls --color=auto"
-		alias grep="grep --color=auto"
-		alias fgrep="fgrep --color=auto"
-		alias egrep="egrep --color=auto"
-	fi
+  #Enable colors
+  if [ "`uname`" != "SunOS" ]; then
+    eval `dircolors -b`
+    alias ls="ls --color=auto"
+    alias grep="grep --color=auto"
+    alias fgrep="fgrep --color=auto"
+    alias egrep="egrep --color=auto"
+  fi
 
-	#nice pretty color prompt with the current host and our current directory
-	PS1="\[\033[01;32m\]\u@\h:\[\033[01;34m\]\w\[\033[00m\]$ "
+  #nice pretty color prompt with the current host and our current directory
+  #PS1="\[\033[01;32m\]\u@\h:\[\033[01;34m\]\w\[\033[00m\]$ "
+  PS1="\e[0;31m\w $\e[m "
 fi
 
 #ease of use
@@ -62,3 +63,27 @@ PATH=/p/oracle10g/bin:${PATH}
 ORACLE_HOME=/p/oracle10g
 LD_LIBRARY_PATH=/p/oracle10g/lib:${LD_LIBRARY_PATH}
 export PATH ORACLE_HOME LD_LIBRARY_PATH
+
+if [[ "$TERM" != "screen-256color" ]] ; then
+  # Attempt to discover a detached session and attach 
+  # it, else create a new session
+
+  WHOAMI=$(whoami)
+  if tmux has-session -t $WHOAMI 2>/dev/null; then
+    tmux -2 attach-session -t $WHOAMI
+  else
+    tmux -2 new-session -s $WHOAMI
+  fi
+else
+
+  # One might want to do other things in this case, 
+  # here I print my motd, but only on servers where 
+  # one exists
+
+  # If inside tmux session then print MOTD
+  MOTD=/etc/motd.tcl
+  if [ -f $MOTD ]; then
+    $MOTD
+  fi
+fi
+eval `dircolors ~/devenv/dircolors-solarized/dircolors.256dark`
