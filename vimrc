@@ -83,8 +83,8 @@ set nolist
 "" Wrapping
 ""
 
-set wrap " Enable wrapping
-set showbreak=↪\  " Character to precede line wraps
+"set wrap " Enable wrapping
+"set showbreak=↪\  " Character to precede line wraps
 
 " Always move down and up by display lines instead of real lines
 " nnoremap <silent>j gj
@@ -96,7 +96,7 @@ set showbreak=↪\  " Character to precede line wraps
 
 " Delete comment character when joining commented lines
 if v:version > 703 || v:version == 703 && has("patch541")
-  set formatoptions+=j     
+  set formatoptions+=j
 endif
 
 " Use only 1 space after "." when joining lines instead of 2
@@ -155,7 +155,7 @@ set number          " Show line numbers
 if has("statusline") && !&cp
   set laststatus=2 " windows always have status line
   set statusline=%f\ %y\%m\%r " filename [type][modified][readonly]
-  "set stl+=%{fugitive#statusline()} " git via fugitive.vim
+  set stl+=%{fugitive#statusline()} " git via fugitive.vim
   " buffer number / buffer count
   set stl+=\[b%n/%{len(filter(range(1,bufnr('$')),'buflisted(v:val)'))}\]
   set stl+=\ %l/%L[%p%%]\,%v " line/total[%],column
@@ -365,6 +365,9 @@ augroup vimrcEx
   " to run commands there
   au! CmdwinEnter * :unmap <cr>
   au! CmdwinLeave * :call MapCR()
+
+  " Trim Trailing white space on general files
+  autocmd FileType c,cc,cpp,java,php,js,css,xml,xsl,s,go,sh autocmd BufWritePre * :%s/[ \t\r]\+$//e
 augroup END
 
 " =============================================================================
@@ -460,6 +463,28 @@ noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 24, 4)<cr>
 
 nmap <leader>` ysiw`
 nmap <leader>' ysiw'
+
+""
+"" Vim-expand-region
+""
+
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+
+""
+"" Vim-airline
+""
+
+let g:airline_theme='powerlineish'
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+"let g:airline_section_z=''
+
+""
+"" Vim-github-comment
+""
+
+let g:github_user = 'cbauschk'
 
 " =============================================================================
 " Application Interaction

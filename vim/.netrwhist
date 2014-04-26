@@ -1,5 +1,2 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
-let g:netrw_dirhist_1='/u/data/u93/cbauschk/cs422_networks/lab04/compile_solaris'
-let g:netrw_dirhist_2='/home/u93/cbauschk'
-let g:netrw_dirhist_3='/home/u93/cbauschk/cs422_networks/lab05'
+let g:netrw_dirhist_cnt =0
